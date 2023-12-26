@@ -49,25 +49,25 @@
                     android:layout_below="@id/question">
 
                     <RadioButton
-                        android:id="@+id/radioButtonOption1"
+                        android:id="@+id/quizRadioButtonOption1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Option 1" />
 
                     <RadioButton
-                        android:id="@+id/radioButtonOption2"
+                        android:id="@+id/quizRadioButtonOption2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Option 2" />
 
                     <RadioButton
-                        android:id="@+id/radioButtonOption3"
+                        android:id="@+id/quizRadioButtonOption3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Option 3" />
 
                     <RadioButton
-                        android:id="@+id/radioButtonOption4"
+                        android:id="@+id/quizRadioButtonOption4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Option 4" />

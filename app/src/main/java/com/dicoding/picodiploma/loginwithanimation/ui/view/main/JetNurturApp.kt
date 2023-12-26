@@ -1,6 +1,7 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.view.main
 
-import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -15,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -32,20 +32,26 @@ import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.pref.BottomBarItem
 import com.dicoding.picodiploma.loginwithanimation.ui.navigation.Screen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.article.ArticleScreen
-import com.dicoding.picodiploma.loginwithanimation.ui.view.article.ArticleViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.view.article.DetailArticleScreen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.ConsultationScreen
-import com.dicoding.picodiploma.loginwithanimation.ui.view.history.HistoryScreen
+import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.KonsultasiViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood.DailyMoodViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.history.HistoryDailyMoodScreen
+import com.dicoding.picodiploma.loginwithanimation.ui.view.history.HistoryConsultationScreen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.home.HomeScreen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.profile.ProfileScreen
 
 //class JetNurturApp {
 //}
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JetNurturApp(
+    page : Int,
     mainViewModel: MainViewModel,
+    resultDailyMoodViewModel: DailyMoodViewModel,
+    konsultasiViewModel: KonsultasiViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -62,11 +68,11 @@ fun JetNurturApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Beranda.route,
+            startDestination = if(page == 1)Screen.Beranda.route else Screen.Konsultasi.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Beranda.route) {
-                HomeScreen(mainViewModel, navigateToConsultation = { listId ->
+                HomeScreen(mainViewModel, resultDailyMoodViewModel, navigateToConsultation = { listId ->
                     navController.navigate(Screen.Konsultasi.route)
                 }, navigateToArticle = { listId ->
                     navController.navigate(Screen.Article.route)
@@ -75,13 +81,20 @@ fun JetNurturApp(
                 })
             }
             composable(Screen.Konsultasi.route) {
-                ConsultationScreen()
+                ConsultationScreen(konsultasiViewModel)
             }
             composable(Screen.Riwayat.route) {
-                HistoryScreen()
+                HistoryConsultationScreen(konsultasiViewModel)
             }
             composable(Screen.Profil.route) {
-                ProfileScreen(mainViewModel)
+                ProfileScreen(navigateToHistoryTransaction = { listId ->
+                    navController.navigate(Screen.Riwayat.route)
+                }, navigateToHistoryMood = { listId ->
+                    navController.navigate(Screen.RiwayatMood.route)
+                }, mainViewModel)
+            }
+            composable(Screen.RiwayatMood.route) {
+                HistoryDailyMoodScreen(mainViewModel, resultDailyMoodViewModel)
             }
             composable(Screen.Article.route) {
                 ArticleScreen(navigateToDetail = { articleId ->
@@ -163,9 +176,12 @@ fun BottomBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun JetNurturAppPreview() {
     lateinit var mainViewMode: MainViewModel
-    JetNurturApp(mainViewMode)
+    lateinit var dailyMoodViewModel: DailyMoodViewModel
+    lateinit var konsultasiViewModel: KonsultasiViewModel
+    JetNurturApp(0, mainViewMode, dailyMoodViewModel, konsultasiViewModel)
 }

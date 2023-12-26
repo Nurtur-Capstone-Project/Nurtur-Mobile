@@ -1,7 +1,5 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.view.main
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,7 +12,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBinding
 import com.dicoding.picodiploma.loginwithanimation.ui.view.ViewModelFactory
-import com.dicoding.picodiploma.loginwithanimation.ui.view.article.ArticleViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.KonsultasiViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.KonsultasiViewModelFactory
+import com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood.DailyMoodViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood.DailyMoodViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.ui.view.login.LoginViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.view.welcome.WelcomeActivity
 
@@ -23,8 +24,12 @@ class MainActivity : AppCompatActivity() {
         ViewModelFactory.getInstance(this)
     }
 
-    private val loginViewModel by viewModels<LoginViewModel> {
-        ViewModelFactory.getInstance(this)
+    val resultDailyMoodViewModel by viewModels<DailyMoodViewModel> {
+        DailyMoodViewModelFactory.getInstance(this)
+    }
+
+    private val konsultasiViewModel by viewModels<KonsultasiViewModel> {
+        KonsultasiViewModelFactory.getInstance(this)
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -45,7 +50,9 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 setContent {
-                    JetNurturApp(viewModel)
+                    JetNurturApp(1, viewModel, resultDailyMoodViewModel, konsultasiViewModel)
+//                    ConsultationReservationScreen()
+//                    RadioButtonExample()
                 }
             }
         }

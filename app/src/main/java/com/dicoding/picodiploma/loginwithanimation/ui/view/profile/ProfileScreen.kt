@@ -40,12 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dicoding.picodiploma.loginwithanimation.R
+import com.dicoding.picodiploma.loginwithanimation.ui.navigation.Screen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.changePassword.ChangePasswordActivity
 import com.dicoding.picodiploma.loginwithanimation.ui.view.main.MainActivity
 import com.dicoding.picodiploma.loginwithanimation.ui.view.main.MainViewModel
 
 @Composable
-fun ProfileScreen(mainViewModel: MainViewModel) {
+fun ProfileScreen(navigateToHistoryTransaction : (String) -> Unit, navigateToHistoryMood: (String) -> Unit, mainViewModel: MainViewModel) {
     val currentUser = mainViewModel.currentUser.observeAsState()
     val context = LocalContext.current
 
@@ -54,13 +55,22 @@ fun ProfileScreen(mainViewModel: MainViewModel) {
     ) {
         BannerProfile(mainViewModel)
 
-        MenuProfile(painterResource(R.drawable.ic_baseline_lock_24), "Ganti Password", Modifier.clickable { context.startActivity(
-            Intent(context, ChangePasswordActivity::class.java)
-        ) })
-        MenuProfile(painterResource(R.drawable.ic_baseline_history_24),"Riwayat Transaksi")
-        MenuProfile(painterResource(R.drawable.ic_baseline_person_24), "Riwayat Daily Mood")
+        MenuProfile(
+            painterResource(R.drawable.ic_baseline_lock_24),
+            "Ganti Password",
+            Modifier.clickable {
+                context.startActivity(
+                    Intent(context, ChangePasswordActivity::class.java)
+                )
+            })
+        MenuProfile(painterResource(R.drawable.ic_baseline_history_24), "Riwayat Transaksi", Modifier.clickable { navigateToHistoryTransaction(currentUser.value?.message?.id ?: "")})
+        MenuProfile(painterResource(R.drawable.ic_baseline_person_24), "Riwayat Daily Mood", Modifier.clickable { navigateToHistoryMood(currentUser.value?.message?.id ?: "") })
         Spacer(modifier = Modifier.height(100.dp))
-        MenuProfileLogout(mainViewModel, painterResource(R.drawable.ic_baseline_logout_24), "Keluar")
+        MenuProfileLogout(
+            mainViewModel,
+            painterResource(R.drawable.ic_baseline_logout_24),
+            "Keluar"
+        )
     }
 }
 
@@ -108,8 +118,10 @@ fun BannerProfile(mainViewModel: MainViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 fun Profile(modifier: Modifier = Modifier) {
-    Column(verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Image(
             painter = painterResource(R.drawable.image_login),
             contentDescription = null,
@@ -135,7 +147,7 @@ fun Profile(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MenuProfile(icon: Painter, name: String, modifier: Modifier = Modifier) {
+fun MenuProfile(icon: Painter, name: String, modifier: Modifier) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -143,9 +155,11 @@ fun MenuProfile(icon: Painter, name: String, modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(1.dp),
         modifier = modifier
     ) {
-        Row(modifier = Modifier
-            .height(52.dp)
-            .width(300.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .height(52.dp)
+                .width(300.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
             Spacer(modifier = Modifier.width(12.dp))
             Image(
                 painter = icon,
@@ -171,7 +185,12 @@ fun MenuProfile(icon: Painter, name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MenuProfileLogout(mainViewModel: MainViewModel, icon: Painter, name: String, modifier: Modifier = Modifier) {
+fun MenuProfileLogout(
+    mainViewModel: MainViewModel,
+    icon: Painter,
+    name: String,
+    modifier: Modifier = Modifier
+) {
     val currentUser = mainViewModel.currentUser.observeAsState()
     val context = LocalContext.current
 
@@ -183,9 +202,16 @@ fun MenuProfileLogout(mainViewModel: MainViewModel, icon: Painter, name: String,
     ) {
         Row(modifier = Modifier
             .height(52.dp)
-            .width(300.dp).clickable { mainViewModel.logout(currentUser.value?.message?.id ?: "", currentUser.value?.message?.token ?: ""); context.startActivity(
+            .width(300.dp)
+            .clickable {
+                mainViewModel.logout(
+                    currentUser.value?.message?.id ?: "",
+                    currentUser.value?.message?.token ?: ""
+                ); context.startActivity(
                 Intent(context, MainActivity::class.java)
-            ) }, verticalAlignment = Alignment.CenterVertically) {
+            )
+            }, verticalAlignment = Alignment.CenterVertically
+        ) {
             Spacer(modifier = Modifier.width(58.dp))
             Text(
                 text = name,
@@ -208,5 +234,7 @@ fun MenuProfileLogout(mainViewModel: MainViewModel, icon: Painter, name: String,
 @Composable
 fun JetCoffeeAppPreview() {
     lateinit var mainViewModel: MainViewModel
-    ProfileScreen(mainViewModel)
+    ProfileScreen(navigateToHistoryTransaction = {
+    }, navigateToHistoryMood = {
+    }, mainViewModel)
 }

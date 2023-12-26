@@ -69,6 +69,7 @@
         android:textColor="#944FCC"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_quiz_appointment"
         android:layout_width="match_parent"
         android:layout_height="238dp"
         android:layout_gravity="clip_horizontal"

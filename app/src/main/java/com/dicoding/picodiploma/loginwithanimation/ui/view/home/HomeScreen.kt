@@ -1,6 +1,8 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.view.home
 
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +49,7 @@ import com.dicoding.picodiploma.loginwithanimation.R
 import coil.compose.AsyncImage
 import com.dicoding.picodiploma.loginwithanimation.data.Article
 import com.dicoding.picodiploma.loginwithanimation.data.MenuConsultationData
+import com.dicoding.picodiploma.loginwithanimation.data.databaseDailyMood.HistoryDailyMood
 import com.dicoding.picodiploma.loginwithanimation.data.pref.MenuConsultationModel
 import com.dicoding.picodiploma.loginwithanimation.ui.theme.BlueKids
 import com.dicoding.picodiploma.loginwithanimation.ui.theme.LightYellow
@@ -60,23 +63,27 @@ import com.dicoding.picodiploma.loginwithanimation.ui.theme.PinkArrow
 import com.dicoding.picodiploma.loginwithanimation.ui.view.article.ArticleScreen
 import com.dicoding.picodiploma.loginwithanimation.ui.view.article.ArticleViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.view.changePassword.ChangePasswordActivity
+import com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood.DailyMoodViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood.UploadFaceMoodActivity
 import com.dicoding.picodiploma.loginwithanimation.ui.view.main.MainViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     mainViewModel: MainViewModel,
+    resultDailyMoodViewModel: DailyMoodViewModel,
     navigateToConsultation: (Int) -> Unit,
     navigateToArticle: (Int) -> Unit,
     navigateToDetail: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val data = resultDailyMoodViewModel.getDailyToday.observeAsState()
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding()
     ) {
-        BannerHome(mainViewModel, navigateToConsultation, navigateToArticle)
+        BannerHome(mainViewModel, navigateToConsultation, navigateToArticle, navigateToDetail, data?.value)
     }
 
 }
@@ -86,6 +93,8 @@ fun BannerHome(
     mainViewModel: MainViewModel,
     navigateToConsultation: (Int) -> Unit,
     navigateToArticle: (Int) -> Unit,
+    navigateToDetail: (Int) -> Unit,
+    dataToday: HistoryDailyMood?,
     modifier: Modifier = Modifier
 ) {
     val articleViewModel: ArticleViewModel = ArticleViewModel()
@@ -105,8 +114,8 @@ fun BannerHome(
             modifier = Modifier.padding(20.dp)
         ) {
             TopSection(currentUser.value?.message?.name ?: "-")
-            DailyMoodSection()
-            ConsultationSection()
+            DailyMoodSection(dataToday)
+            ConsultationSection(Modifier.clickable { navigateToConsultation(0) })
             TitleSection("Konsultasi", "Lihat Semua", navigateToConsultation)
 
             LazyRow(
@@ -120,6 +129,7 @@ fun BannerHome(
                         painterResource(consultation.icon),
                         consultation.name
                     )
+                    Spacer(modifier = Modifier.width(10.dp))
                 }
             }
             TitleSection("Artikel terbaru", "Lihat Semua", navigateToArticle)
@@ -127,7 +137,8 @@ fun BannerHome(
                 contentPadding = PaddingValues(horizontal = 10.dp)
             ) {
                 items(articleViewModel.articles, key = { it.id }) { article ->
-                    MenuArticle(article)
+                    MenuArticle(article, navigateToDetail)
+                    Spacer(modifier = Modifier.width(10.dp))
                 }
             }
         }
@@ -165,7 +176,7 @@ fun TopSection(name: String) {
 }
 
 @Composable
-fun DailyMoodSection(modifier: Modifier = Modifier) {
+fun DailyMoodSection(dataToday: HistoryDailyMood?) {
     val context = LocalContext.current
 
     ElevatedCard(
@@ -173,8 +184,13 @@ fun DailyMoodSection(modifier: Modifier = Modifier) {
             defaultElevation = 3.dp
         ),
         shape = RoundedCornerShape(8.dp),
-        modifier = Modifier.padding(top = 20.dp).clickable { context.startActivity(
-            Intent(context, UploadFaceMoodActivity::class.java)) }
+        modifier = Modifier
+            .padding(top = 20.dp)
+            .clickable {
+                context.startActivity(
+                    Intent(context, UploadFaceMoodActivity::class.java)
+                )
+            }
     ) {
         Row(
             modifier = Modifier
@@ -182,19 +198,45 @@ fun DailyMoodSection(modifier: Modifier = Modifier) {
                 .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(8.dp))
-            Image(
-                painter = painterResource(R.drawable.empty_expression),
-                contentDescription = "Banner Image",
-                modifier = Modifier.size(45.dp)
-            )
+            if(dataToday != null){
+                if(dataToday.hasil == "Mood Baik"){
+                    Image(
+                        painter = painterResource(R.drawable.happy_reaction),
+                        contentDescription = "Banner Image",
+                        modifier = Modifier.size(45.dp)
+                    )
+                }
+                else if(dataToday.hasil == "Mood Sedang"){
+                    Image(
+                        painter = painterResource(R.drawable.flat_reaction),
+                        contentDescription = "Banner Image",
+                        modifier = Modifier.size(45.dp)
+                    )
+                }
+                else{
+                    Image(
+                        painter = painterResource(R.drawable.angry_reaction),
+                        contentDescription = "Banner Image",
+                        modifier = Modifier.size(45.dp)
+                    )
+                }
+
+            }
+            else{
+                Image(
+                    painter = painterResource(R.drawable.empty_expression),
+                    contentDescription = "Banner Image",
+                    modifier = Modifier.size(45.dp)
+                )
+            }
             Spacer(modifier = Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = "Anda belum mengisi",
+                    text = "Anda telah mengisi",
                     fontSize = 14.sp,
                 )
                 Text(
-                    text = "Ayo isi daily mood anda",
+                    text = "Mood Buruk",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -231,7 +273,7 @@ fun TitleSection(name: String, action: String, navigate: (Int) -> Unit) {
 }
 
 @Composable
-fun ConsultationSection(modifier: Modifier = Modifier) {
+fun ConsultationSection(modifier: Modifier) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -240,7 +282,7 @@ fun ConsultationSection(modifier: Modifier = Modifier) {
             containerColor = LightYellow
         ),
         shape = RoundedCornerShape(8.dp),
-        modifier = Modifier.padding(top = 20.dp)
+        modifier = modifier.padding(top = 20.dp)
     ) {
         Row(
             modifier = Modifier
@@ -326,11 +368,13 @@ fun MenuConsultation(
 @Composable
 fun MenuArticle(
     article: Article,
+    navigateToDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
         modifier = modifier
-            .width(260.dp),
+            .width(260.dp)
+            .clickable { navigateToDetail(article.id) },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -343,6 +387,7 @@ fun MenuArticle(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(150.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
             Text(
@@ -354,6 +399,7 @@ fun MenuArticle(
                 ),
             )
         }
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
@@ -384,13 +430,13 @@ fun MenuConsultationPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun DailyMoodSectionPreview() {
-    DailyMoodSection()
+//    DailyMoodSection()
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun ConsultationSectionPreview() {
-    ConsultationSection()
+    ConsultationSection(Modifier)
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)

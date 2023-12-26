@@ -2,6 +2,7 @@ package com.dicoding.picodiploma.loginwithanimation.ui.view.dailyMood
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ListView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.picodiploma.loginwithanimation.R
@@ -11,6 +12,7 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityDailyMood
 class DailyMoodQuizActivity : AppCompatActivity() {
     private lateinit var adapter: QuizAdapter
     private lateinit var recyclerView: RecyclerView
+//    private lateinit var recyclerView: ListView
     private lateinit var binding: ActivityDailyMoodQuizBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +24,7 @@ class DailyMoodQuizActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.rvKuis)
         recyclerView.setHasFixedSize(true)
 
-        // Set layout manager
+//         Set layout manager
         recyclerView.layoutManager = LinearLayoutManager(this)
         setQuestion()
     }

@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,10 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.dicoding.picodiploma.loginwithanimation.R
-import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.ConsultationScreen
 import com.dicoding.picodiploma.loginwithanimation.ui.theme.PrimaryColor
+import com.dicoding.picodiploma.loginwithanimation.ui.view.consultation.KonsultasiViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.view.history.HistoryCard
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
+
 class Tab {
 }
 
@@ -33,7 +38,7 @@ class Tab {
 @OptIn(ExperimentalUnitApi::class)
 @ExperimentalPagerApi
 @Composable
-fun TabLayout() {
+fun TabLayout(konsultasiViewModel: KonsultasiViewModel) {
 
     // on below line we are creating variable for pager state.
     val pagerState = rememberPagerState(pageCount = 3)
@@ -49,7 +54,7 @@ fun TabLayout() {
         Tabs(pagerState = pagerState)
         // on below line we are calling tabs content
         // for displaying our page for each tab layout
-        TabsContent(pagerState = pagerState)
+        TabsContent(pagerState = pagerState, konsultasiViewModel)
     }
 }
 
@@ -142,7 +147,7 @@ fun Tabs(pagerState: PagerState) {
 // in which we will be displaying the individual page of our tab .
 @ExperimentalPagerApi
 @Composable
-fun TabsContent(pagerState: PagerState) {
+fun TabsContent(pagerState: PagerState, konsultasiViewModel: KonsultasiViewModel) {
     // on below line we are creating
     // horizontal pager for our tab layout.
     HorizontalPager(state = pagerState) {
@@ -152,13 +157,13 @@ fun TabsContent(pagerState: PagerState) {
         when (page) {
             // on below line we are calling tab content screen
             // and specifying data as Home Screen.
-            0 -> TabContentScreen(data = "Welcome to Home Screen")
+            0 -> TabContentScreen(konsultasiViewModel)
             // on below line we are calling tab content screen
             // and specifying data as Shopping Screen.
-            1 -> TabContentScreen(data = "Welcome to Shopping Screen")
+            1 -> TabContentScreen(konsultasiViewModel)
             // on below line we are calling tab content screen
             // and specifying data as Settings Screen.
-            2 -> TabContentScreen(data = "Welcome to Settings Screen")
+            2 -> TabContentScreen(konsultasiViewModel)
         }
     }
 }
@@ -166,13 +171,20 @@ fun TabsContent(pagerState: PagerState) {
 // on below line we are creating a Tab Content
 // Screen for displaying a simple text message.
 @Composable
-fun TabContentScreen(data: String) {
+//fun TabContentScreen(data: String) {
+fun TabContentScreen(konsultasiViewModel: KonsultasiViewModel) {
     // on below line we are creating a column
-    Column(
-        // in this column we are specifying modifier
-        // and aligning it center of the screen on below lines.
-        modifier = Modifier.fillMaxSize(),
-    ) {
+//    Column(
+//        // in this column we are specifying modifier
+//        // and aligning it center of the screen on below lines.
+//        modifier = Modifier.fillMaxSize(),
+//    ) {
+    val data = konsultasiViewModel.getKonsultasi.observeAsState()
+        Column(
+
+            modifier = Modifier.fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
         // in this column we are specifying the text
 //        Text(
 //            // on below line we are specifying the text message
@@ -190,10 +202,59 @@ fun TabContentScreen(data: String) {
 //            //on below line we are specifying the text alignment.
 //            textAlign = TextAlign.Center
 //        )
-        ConsultationCard(modifier = Modifier.padding(), PrimaryColor, "Ayu Wardani M.Psi", painterResource(R.drawable.empty_expression), "14 Jun 2023", "19.00 - 20.00", "Manajemen Waktu", "Mulai Sekarang")
-        ConsultationCard(modifier = Modifier.padding(), PrimaryColor, "Ayu Wardani M.Psi", painterResource(R.drawable.empty_expression), "14 Jun 2023", "19.00 - 20.00", "Manajemen Waktu", "Mulai Sekarang")
-        ConsultationCard(modifier = Modifier.padding(), PrimaryColor, "Ayu Wardani M.Psi", painterResource(R.drawable.empty_expression), "14 Jun 2023", "19.00 - 20.00", "Manajemen Waktu", "Mulai Sekarang")
-        ConsultationCard(modifier = Modifier.padding(), PrimaryColor, "Ayu Wardani M.Psi", painterResource(R.drawable.empty_expression), "14 Jun 2023", "19.00 - 20.00", "Manajemen Waktu", "Mulai Sekarang")
+            for(konsultasiHistory in data?.value ?: konsultasiViewModel.konsultasi) {
+                HistoryCard(konsultasiHistory.photo, konsultasiHistory.dokter, konsultasiHistory.label, konsultasiHistory.tanggal, konsultasiHistory.waktu )
+//                ConsultationCard(
+//                    modifier = Modifier.padding(),
+//                    PrimaryColor,
+//                    "Ayu Wardani M.Psi",
+//                    painterResource(R.drawable.empty_expression),
+//                    "14 Jun 2023",
+//                    "19.00 - 20.00",
+//                    "Manajemen Waktu",
+//                    "Mulai Sekarang"
+//                )
+            }
+//        ConsultationCard(
+//            modifier = Modifier.padding(),
+//            PrimaryColor,
+//            "Ayu Wardani M.Psi",
+//            painterResource(R.drawable.empty_expression),
+//            "14 Jun 2023",
+//            "19.00 - 20.00",
+//            "Manajemen Waktu",
+//            "Mulai Sekarang"
+//        )
+//        ConsultationCard(
+//            modifier = Modifier.padding(),
+//            PrimaryColor,
+//            "Ayu Wardani M.Psi",
+//            painterResource(R.drawable.empty_expression),
+//            "14 Jun 2023",
+//            "19.00 - 20.00",
+//            "Manajemen Waktu",
+//            "Mulai Sekarang"
+//        )
+//        ConsultationCard(
+//            modifier = Modifier.padding(),
+//            PrimaryColor,
+//            "Ayu Wardani M.Psi",
+//            painterResource(R.drawable.empty_expression),
+//            "14 Jun 2023",
+//            "19.00 - 20.00",
+//            "Manajemen Waktu",
+//            "Mulai Sekarang"
+//        )
+//        ConsultationCard(
+//            modifier = Modifier.padding(),
+//            PrimaryColor,
+//            "Ayu Wardani M.Psi",
+//            painterResource(R.drawable.empty_expression),
+//            "14 Jun 2023",
+//            "19.00 - 20.00",
+//            "Manajemen Waktu",
+//            "Mulai Sekarang"
+//        )
     }
 }
 
@@ -201,5 +262,6 @@ fun TabContentScreen(data: String) {
 @Composable
 @Preview(showBackground = true)
 fun TabLayoutPreview() {
-    TabLayout()
+    lateinit var konsultasiViewModel: KonsultasiViewModel
+    TabLayout(konsultasiViewModel)
 }

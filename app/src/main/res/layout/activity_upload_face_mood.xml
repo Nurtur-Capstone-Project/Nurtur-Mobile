@@ -7,7 +7,7 @@
     tools:context=".ui.view.dailyMood.UploadFaceMoodActivity">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progressIndicator"
+        android:id="@+id/progressIndicatorFaceDetection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
@@ -37,7 +37,7 @@
         android:layout_width="239dp"
         android:layout_height="70dp"
         android:layout_marginBottom="20dp"
-        android:text="foto wajah anda akan digunakan untuk mendeteksi mood anda saat ini"
+        android:text="foto wajah anda akan digunakan untuk mendeteksi mood anda saat ini. Privasi anda akan tetap terjaga."
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

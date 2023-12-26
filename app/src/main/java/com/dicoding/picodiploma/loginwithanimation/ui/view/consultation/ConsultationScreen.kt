@@ -1,6 +1,8 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.view.consultation
 
+import android.content.Intent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,12 +42,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ConsultationScreen() {
+fun ConsultationScreen(konsultasiViewModel : KonsultasiViewModel) {
     Column {
         SectionText("Manajemen Waktu")
         CategoryRow()
         SectionText("Konsultasiku")
-        TabLayout()
+        TabLayout(konsultasiViewModel)
     }
 }
 
@@ -114,8 +117,11 @@ fun CategoryItem(
     cardColor: Color,
     category: String
 ) {
+    val context = LocalContext.current
     Column(
-        modifier = modifier,
+        modifier = modifier.clickable { context.startActivity(
+            Intent(context,ConsultationReservationPsikologActivity::class.java )
+        ) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ElevatedCard(
@@ -159,5 +165,6 @@ fun CategoryItemPreview() {
 @Composable
 @Preview(showBackground = true)
 fun ConsultationScreenPreview() {
-    ConsultationScreen()
+    lateinit var konsultasiViewModel: KonsultasiViewModel
+    ConsultationScreen(konsultasiViewModel)
 }
